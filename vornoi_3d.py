@@ -7,17 +7,19 @@ from tqdm import tqdm
 from mpl_toolkits.mplot3d import Axes3D
 
 
+is_3d = True
+
 # gif data
 anim = []
 TITLE = 'Vectorial quantising - Vornoi cells'
 gif_fig = plt.figure(figsize=(10, 10))
-# gif_ax = plt.subplot(111, projection="3d")
+gif_ax = plt.subplot(111, projection="3d")
 gif_clusters, gif_centers = [], []
 
 
 def main():
     n_points = 10000
-    n_dim = 2
+    n_dim = 3
     distribution_1 = np.random.normal(
         loc=1, scale=2, size=(n_points // 2, n_dim))
     distribution_2 = np.random.normal(
@@ -41,7 +43,7 @@ def cluster_forming(points: np.ndarray, centers: np.ndarray):
     return clusters
 
 
-def LBG(points: np.ndarray, initial_cells: int = 2, eps: float = 0.005, max_cells: int = 8, as_gif=False):
+def LBG(points: np.ndarray, initial_cells: int = 2, eps: float = 0.005, max_cells: int = 8, as_gif=False, is_3d=True):
     """ """
     assert points.shape[1] == 2 or points.shape[
         1] == 3, "wrong array shape, must be (*,2) or (*,3)"
@@ -91,8 +93,6 @@ def LBG(points: np.ndarray, initial_cells: int = 2, eps: float = 0.005, max_cell
     if as_gif:  # creating the gif
         global gif_fig
         global anim
-    #	if is_3d:
-    #		plt.subplot(111, projection='3d')
         anim = animation.FuncAnimation(
             gif_fig, animate, frames=iters, interval=300, repeat=True)
         # anim.save(TITLE + '.gif', fps=4, writer='ffmpeg')
@@ -102,9 +102,17 @@ def LBG(points: np.ndarray, initial_cells: int = 2, eps: float = 0.005, max_cell
 
 def animate(nframe: int):
     plt.cla()
-    for cluster in gif_clusters[nframe]:
-        plt.plot(cluster[:, 0], cluster[:, 1], '.')
-    plt.plot(gif_centers[nframe][:, 0], gif_centers[nframe][:, 1], 'sk')
+    global is_3d
+
+    if not is_3d:
+        for cluster in gif_clusters[nframe]:
+            plt.plot(cluster[:, 0], cluster[:, 1], '.')
+        plt.plot(gif_centers[nframe][:, 0], gif_centers[nframe][:, 1], 'sk')
+    else:
+        for cluster in gif_clusters[nframe]:
+            gif_ax.plot(cluster[:, 0], cluster[:, 1], cluster[:, 2], '.')
+        plt.plot(gif_centers[nframe][:, 0], gif_centers[
+                 nframe][:, 1], gif_centers[nframe][:, 2], 'sk')
     plt.title(TITLE)
 
 if __name__ == '__main__':

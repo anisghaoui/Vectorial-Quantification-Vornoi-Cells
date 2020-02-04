@@ -2,7 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-N = 50
+N = 5000
 
 data = np.random.rand(N, 2).astype('float32')
 
